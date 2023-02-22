@@ -13,10 +13,10 @@ data:
   batch_size: 128
 
   cutout: false
-  download: false
+  download: true
 
 optim:
-  epochs:  20
+  epochs: 20
 
   main_lr: 1e-3
   policy_lr: 1e-3
