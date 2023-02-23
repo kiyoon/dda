@@ -3,6 +3,7 @@ import pathlib
 from dataclasses import dataclass
 from typing import Any, Mapping, Tuple
 
+import exp_configs
 import homura
 import hydra
 import torch
@@ -35,9 +36,15 @@ class Discriminator(nn.Module):
 
 class AdvTrainer(trainers.TrainerBase):
     # acknowledge https://github.com/caogang/wgan-gp/blob/master/gan_cifar10.py
-    def iteration(self, data: Tuple[Tensor, Tensor]) -> Mapping[str, Tensor]:
+    def iteration(self, data) -> Mapping[str, Tensor]:
         # input: [-1, 1]
-        input, target = data
+        # input, target = data
+        inputs, uids, labels, spatial_idx, _, frame_indices = data
+        N, C, T, H, W = inputs.shape
+        assert T == 1
+        input = inputs.view(N, C, H, W)
+        target = labels
+
         b = input.size(0) // 2
         a_input, a_target = input[:b], target[:b]
         n_input, n_target = input[b:], target[b:]
@@ -155,14 +162,27 @@ class BaseConfig(Config):
 
 
 def search(cfg: BaseConfig):
-    train_loader, _, num_classes = DATASET_REGISTRY(cfg.data.name)(
-        batch_size=cfg.data.batch_size,
-        train_size=cfg.data.train_size,
-        drop_last=True,
-        download=cfg.data.download,
-        return_num_classes=True,
-        num_workers=4,
+    exp_cfg = exp_configs.load_cfg(
+        "hmdb", "tsm_resnet50", "1frame", exp_channel="extremeaug"
     )
+    torch_dataset = exp_cfg.get_torch_dataset("train")
+    train_loader = torch.utils.data.DataLoader(
+        torch_dataset,
+        batch_size=cfg.data.batch_size,
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
+        drop_last=True,
+    )
+    num_classes = exp_cfg.dataset_cfg.num_classes
+    # train_loader, _, num_classes = DATASET_REGISTRY(cfg.data.name)(
+    #     batch_size=cfg.data.batch_size,
+    #     train_size=cfg.data.train_size,
+    #     drop_last=True,
+    #     download=cfg.data.download,
+    #     return_num_classes=True,
+    #     num_workers=4,
+    # )
     model = {
         "main": Discriminator(MODEL_REGISTRY("wrn40_2")(num_classes)),
         "policy": Policy.faster_auto_augment_policy(
@@ -246,4 +266,5 @@ train_loader, _, num_classes = DATASET_REGISTRY(cfg.data.name)(
 )
 
 # %%
-next(train_loader)
+train_iter = iter(train_loader)
+next(train_iter)[0].shape

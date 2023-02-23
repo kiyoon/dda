@@ -4,13 +4,13 @@ This is the official *re*implementation of FasterAutoAugment ([hataya2020a](http
 
 ## Requirements
 
-* `Python>=3.8`  # Developed on 3.8. It may work with earlier versions.
-* `PyTorch==1.5.0` # Required by `kornia`
-* `torchvision==0.6.0`
-* `kornia==0.3.1`
-* `homura==2020.07` # `pip install -U git+https://github.com/moskomule/homura@v2020.07`
-* `hydra==0.11` 
-
+- `Python>=3.8` # Developed on 3.8. It may work with earlier versions.
+- `PyTorch==1.13.1`
+- `torchvision==0.14.1`
+- `kornia==0.5.0`
+- `homura==2020.07` # `pip install -U git+https://github.com/moskomule/homura@v2020.07`
+- `hydra-core==1.3.1`
+- `omegaconf==2.3.0`
 
 ## How to Run
 
@@ -34,8 +34,8 @@ When `path` is not specified, training is executed without policy, which can be 
 
 ## Notice
 
-The codebase here is not exactly the same as the one used in the paper. 
-For example, this codebase does not include the support for `DistributedDataParallel` and the custom `CutOut` kernel. 
+The codebase here is not exactly the same as the one used in the paper.
+For example, this codebase does not include the support for `DistributedDataParallel` and the custom `CutOut` kernel.
 But, we believe this reimplementation is much simpler, more stable, and easier to extend for your research projects.
 
 ## Citation

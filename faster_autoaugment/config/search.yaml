@@ -10,7 +10,7 @@ model:
 data:
   name: cifar10
   train_size: 4_000
-  batch_size: 128
+  batch_size: 16
 
   cutout: false
   download: true
