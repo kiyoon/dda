@@ -184,7 +184,7 @@ def search(cfg: BaseConfig):
     #     num_workers=4,
     # )
     model = {
-        "main": Discriminator(MODEL_REGISTRY("wrn40_2")(num_classes)),
+        "main": Discriminator(MODEL_REGISTRY("resnet50")(num_classes)),
         "policy": Policy.faster_auto_augment_policy(
             cfg.model.num_sub_policies,
             cfg.model.temperature,
@@ -213,11 +213,12 @@ def search(cfg: BaseConfig):
     ) as trainer:
         for _ in tqdm:
             trainer.train(train_loader)
-        trainer.save(
-            pathlib.Path(hydra.utils.get_original_cwd())
-            / "policy_weights"
-            / cfg.data.name
-        )
+        # weights_path = pathlib.Path(hydra.utils.get_original_cwd())
+        #     / "policy_weights"
+        #     / cfg.data.name
+        weights_path = pathlib.Path("policy_weights") / cfg.data.name
+
+        trainer.save(weights_path)
 
 
 def is_ipython():
